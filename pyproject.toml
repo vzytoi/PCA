@@ -1,0 +1,7 @@
+[build-system]
+requires = ["scikit-build-core>=0.10.0", "pybind11", "packaging>=24.2"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pca"
+version = "0.1.0"
