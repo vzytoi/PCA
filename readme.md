@@ -24,37 +24,15 @@ M = [
 # Target dimension
 k = 2
 
-M_reduced = pca.run(M, k)
+res = pca.fit(dataset, 2)
 
-```
+# dataset M reduced to k parameters
+M_reduced = res["projected"]
 
-If you want to quickly understand why dimensionality reduction is useful, you can follow the example below.
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from random import uniform
-import pca
-
-d = 0.05
-data3d = np.array([
-    [r + uniform(-d, d), r + uniform(-d, d), i / 9]
-    for i in range(10)
-    for _ in range(5)
-    for r in [uniform(0, 1)]
-])
-
-fig = plt.figure()
-ax = fig.add_subplot(111, projection="3d")
-ax.scatter(data3d[:, 0], data3d[:, 1], data3d[:, 2], s=35)
-plt.show()
-
-data2d = np.array(pca.run(data3d.tolist(), 2), dtype=float)
-
-plt.figure()
-plt.scatter(data2d[:, 0], data2d[:, 1], s=35)
-plt.axis("equal")
-plt.show()
+# the base in which the projection as been made and the mean of the initial dataset
+# if you want to project some more point: (test - means) @ W
+W = res["W"]
+means = res["means"]
 ```
 
 The left image represents the generated data in 3D. You may notice that one axis does not carry much information. In this case, reducing the dimension to 2 is especially interesting because very little information is lost. 
@@ -74,3 +52,28 @@ The right image shows the same dataset after applying PCA.
 ## How it works
 
 If you want more detail on how TCA works and the implementation choices I made, checkout  [How PCA works (PDF)](docs/how_it_works.pdf)
+
+## Why is PCA used?
+
+Using a [Breast Cancer Diagnosis Data Set](https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data?resource=download) you can visualise data in 2d, then project a new entry and calculate the average distance.
+You get:
+
+<center>
+      <img src="docs/images/pca_bcd.png" height="350px" />
+</center>
+
+You can clearly do better than a 7% error rate. Maybe the 3rd more important direction still contains a lot of information. Let's check that out:
+
+<center>
+      <img src="docs/images/pca_bcd_2.png" height="350px" />
+</center>
+
+The error rate remains constant. Although this may seem unexpected, it can be explained by the fact that most of the discriminative information is captured by the first two principal components. The additional components mainly introduce noise and do not contribute significantly to class separation.
+
+In contrast, when using a more complex dataset such as [load_digits](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html), where the informative variance is spread across several directions, we can clearly observe how the average error evolves as a function of the number of retained dimensions.
+
+<center>
+      <img src="docs/images/pca_digits.png" height="350px" />
+</center>
+
+This highlights another practical use of PCA. As observed, beyond approximately 40 components, the error rate remains almost unchanged. Consequently, reducing the dimensionality to 30–40 components before training a neural network could significantly reduce computational cost without sacrificing performance.
