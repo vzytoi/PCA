@@ -73,31 +73,4 @@ The right image shows the same dataset after applying PCA.
 
 ## How it works
 
-Let $X \in \mathcal{M}_{n, p}(\mathbb{R})$ be a matrix of our dataset where n is the number of sambles each composed of p parameters. We want a matrix $R \in \mathcal{M}_{n, k}(\mathbb{R})$ with $k<p$
-
-The first step is to compute $X^TX$ because if we take a random direction $w \in \mathbb{R}^p$ such that $\lVert w \rVert = 1$ then the data projected on this axe will be $Xw$. Because we are looking for the direction who will keep the more information which mean maximize the variance of the projection, we are basically looking for 
-
-$$
-\begin{align*}
-\operatorname{Var}(Xw) &= \mathbb{E}[(Xw)^2] - \mathbb{E}(Xw)^2\\
-                        &= \frac{1}{n}\lVert Xw \rVert^2\\
-                        &\propto w^TX^TXw
-\end{align*}                        
-$$
-
-because if necessary $\tilde{X}_{(i)} = X_{(i)} - \operatorname{mean}(X_{(i)})$ so we can assume that $\mathbb{E}[X]=0$. It is in fact the very first thing to do before computing $X^TX$.
-So in order to find our very first direction, we need to find
-$$
-    \argmax_{\lVert w \rVert\,=\,1}\left\{w^TX^TXw\right\} = \argmax\left\{\frac{w^TX^TXw}{w^Tw}\right\}
-$$
-We recognize the [Rayleigh quotient](https://en.wikipedia.org/wiki/Rayleigh_quotient). It is know that for a matrix such as $X^TX$ this quantity is maximum for the biggest $\lambda_{max} \in \operatorname{Sp}(X^TX)$ which occurs when $w = v_{max}$, with $v_{max}$ the eigenvector associed to $\lambda_{max}$.
-
-So we found our first direction $w_{1}=v_{max}$. Our intuition tells us that we now have to find the second vector by using the exact same idea but on a new matrix $\tilde{X}$ where all the informations given by $w_{1}$ have been removed:
-
-$$
-    \tilde{X}_k=X-\sum_{i=1}^{k-1}Xw_{s}w_{s}^T
-$$
-
-We ends up with the same Rayligh quotient with $\tilde{X}_k$. It turns out that the k-th vector $w_k$ we are looking for is the eigenvector corresponding to the k-th biggest eigenvalues. If $\left\{\lambda_1, \dots, \lambda_n \right\}$ are sorted then the $k$ vectors we are looking for are the $\left\{v_1, \dots, v_k \right\}$ corresponding.
-
-Without entering details, those eigenvalues can be calculated using the [QR algorithm](https://en.wikipedia.org/wiki/QR_algorithm). I chosed to use the [Gram-Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) to find the QR decomposition. Then It's possible to use [Inverse iteration](https://en.wikipedia.org/wiki/Inverse_iteration) algorithm to find the corresponding eigenvalues. The Inverse iteration algorithm require to inverse matrices for which I used the [Gaussian elimination](https://en.wikipedia.org/wiki/Gaussian_elimination) even thought faster method exists.
+If you want more detail on how TCA works and the implementation choices I made, checkout  [How PCA works (PDF)](docs/how_it_works.pdf)
